@@ -1,23 +1,32 @@
 # INTRODUCTION
 
-This is a project repo for the [Chainlink Fall 2022 Hackathon](https://chain.link/hackathon).
 The project is called W3SO - Web3 Security Oracle - which allows providing the security analysis score on-chain.
 
 # Recommended Prerequisites
 
+1. `docker`
+2. `docker pull mythril/myth`
+3. `Running Chainlink Node`
+
 # Repo Structure
+
+- `backend-server` - all code regarding EA
+- `contracts` - contracts with example usage of oracle
 
 # Getting Started
 
+1. `cd backend-server && yarn` - get into dir and install packages
+2. `yarn start` - to start server
+
 ## Request Data
 
-`curl -X POST -H "content-type:application/json" "http://localhost:8080/" --data '{ "id": 10, "data": { "number":19, "infoType": "math" } }'` for the API to provide some math fact about the number `19`.
+`curl -X POST -H "content-type:application/json" "http://localhost:8080/" --data '{ "id": 10, "data": { "address":"0x5c436ff914c458983414019195e0f4ecbef9e6dd" }}'` for the API to run mythril inside docker and return the security score for provided address.
 
 When interacting with a Chainlink Node, the External Adapter will receive a post request that looks something like this:
 
 ```
 {
-  data: { infoType: 'trivia', number: '9' },
+  data: { address: '0x123...' },
   id: '0x93fd920063d2462d8dce013a7fc75656',
   meta: {
     oracleRequest: {
@@ -34,14 +43,16 @@ Our external adapter returns data in the following structure ([docs](https://doc
 
 ```
 returned response:   {
-  jobRunId: '0x93fd920063d2462d8dce013a7fc75656',
-  statusCode: 200,
+  jobRunID:10,
   data: {
-    result: "9 is the number of circles of Hell in Dante's Divine Comedy."
+    result: {
+      address: "0x5c436ff914c458983414019195e0f4ecbef9e6dd",
+      score: 0.0625
+    },
   }
 }
 ```
 
 # Architecture Diagram
 
-![alt Architecture Drawing Showing The Interaction within the System](../architecture.png "Architecture Diagram")
+![alt Architecture Drawing Showing The Interaction within the System](./architecture.png "Architecture Diagram")
