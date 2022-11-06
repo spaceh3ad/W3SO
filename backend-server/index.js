@@ -24,26 +24,20 @@ const customParams = {
  * @param {any} input
  * @param {(status:number, result:any)=>{}} callback
  */
-const createRequest = (input, callback) => {
+const createRequest = async (input, callback) => {
   // The Validator helps you validate the Chainlink request data);
   const validator = new Validator(input, customParams);
 
   const jobRunID = validator.validated.id;
-  const endpoint = validator.validated.data.endpoint || ""; // Note: - no endpoint param in this example. Endpoint means  REST resource.
   const address = validator.validated.data.address;
 
-  let score = lib.mythrilScan(address);
+  let report = await lib.mythrilScan(address);
+  // let report = { score: 0.591, cid: "TEST" };
 
-  let result = {
-    address: address,
-    score: score,
-  };
-
-  let response = {};
+  const response = { date: "", result: report };
 
   response.data = {
-    result: result,
-    date: "",
+    result: report,
   };
 
   callback(200, Requester.success(jobRunID, response));

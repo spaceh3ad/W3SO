@@ -1,8 +1,18 @@
 require("dotenv").config();
+const { Web3Storage, File } = require("web3.storage");
 
-function parseResult(array) {
-  let score = 0;
+function makeStorageClient() {
+  return new Web3Storage({ token: process.env.WEB3_STORAGE });
+}
 
+function makeFileObjects(result) {
+  const buffer = Buffer.from(JSON.stringify(result));
+
+  const file = [new File([buffer], `metadata.json`)];
+  return file;
+}
+
+async function parseResult(report) {
   // 1 => contract safe no issues found
   // 0.05 => dangerous
 
@@ -12,31 +22,54 @@ function parseResult(array) {
 
   // score = 1/[num_of_issues]/[sum_of_all_issues]
 
-  if (array[0].issues === []) {
+  let result = {
+    score: 0,
+    report: report,
+  };
+
+  if (report[0].issues === []) {
     return 1; //asume contract ok if no issues found
   } else {
-    let issuesArr = array[0].issues;
+    let issuesArr = report[0].issues;
     for (let index = 0; index < issuesArr.length; index++) {
       if (issuesArr[index].severity === "Medium") {
-        score += 3;
+        result.score += 3;
       } else if (issuesArr[index].severity === "High") {
-        score += 5;
+        result.score += 5;
       } else {
         // low
-        score += 1;
+        result.score += 1;
       }
     }
-    return 1 / issuesArr.length / score;
+
+    console.log("Uploading result to IPFS");
+    const client = makeStorageClient();
+    const reportObj = makeFileObjects(result);
+    const cid_metadata = await client.put(reportObj);
+    console.log(`Uploaded to IPFS at : https://${cid_metadata}.ipfs.w3s.link/`);
+
+    return {
+      score: result.score,
+      cid: `https://${cid_metadata}.ipfs.w3s.link/`,
+    };
   }
 }
 
-function mythrilScan(address) {
+async function mythrilScan(address) {
   let cmd = `docker run mythril/myth analyze -a ${address} --execution-timeout 100 --infura-id ${process.env.INFURA_ID} -o jsonv2`;
 
   const execSync = require("child_process").execSync;
+  console.log(`Job for ${address} spawned`);
   const result = execSync(cmd);
   const resultParsed = JSON.parse(result.toString("utf8"));
-  return parseResult(resultParsed);
+  let meta = resultParsed[0].meta;
+
+  console.log(
+    `Elapsed in ${
+      meta.mythril_execution_info.analysis_duration / 1000000000.0
+    } sec.`
+  );
+  return await parseResult(resultParsed);
 }
 
 module.exports = { mythrilScan };

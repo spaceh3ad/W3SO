@@ -9,16 +9,26 @@ import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
  * DO NOT USE THIS CODE IN PRODUCTION.
  */
 
-contract ConsumerContract is ChainlinkClient, ConfirmedOwner {
+/// @notice Web3 Secrutiy Oracle (W3SO)
+/// @notice allows to retrive a security score for smart contract
+contract W3SO is ChainlinkClient, ConfirmedOwner {
     using Chainlink for Chainlink.Request;
 
     uint256 private constant ORACLE_PAYMENT = 1 * LINK_DIVISIBILITY; // 1 * 10**18
-    string public lastRetrievedInfo;
+
+    mapping(address => Score) public addressToResult;
+
+    uint1 scoreDecimals = 2;
 
     event RequestForInfoFulfilled(
         bytes32 indexed requestId,
         string indexed response
     );
+
+    struct Score {
+        uint8 sscore;
+        string uri;
+    }
 
     /**
      *  Goerli
@@ -32,19 +42,16 @@ contract ConsumerContract is ChainlinkClient, ConfirmedOwner {
     function requestInfo(
         address _oracle,
         string memory _jobId,
-        string memory number,
-        string memory infoType
         address target
     ) public onlyOwner {
+        console.log(addressToIPFSResult[target]);
+        require(addressToIPFSResult[target] != 0x0);
         Chainlink.Request memory req = buildOperatorRequest(
             stringToBytes32(_jobId),
             this.fulfillRequestInfo.selector
         );
-        
-        if(isContract(target)) {
-            req.add("isContract", true);
-        }
 
+        require(isContract(target));
         req.add("address", target);
 
         sendOperatorRequestTo(_oracle, req, ORACLE_PAYMENT);
