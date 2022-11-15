@@ -42,6 +42,7 @@ async function parseResult(report) {
       }
     }
 
+    result.score = (1 / issuesArr.length / result.score) * 10_000;
     console.log("Uploading result to IPFS");
     const client = makeStorageClient();
     const reportObj = makeFileObjects(result);
@@ -49,7 +50,7 @@ async function parseResult(report) {
     console.log(`Uploaded to IPFS at : https://${cid_metadata}.ipfs.w3s.link/`);
 
     return {
-      score: (1 / issuesArr.length / result.score) * 10_000,
+      score: String(result.score).valueOf(),
       cid: `https://${cid_metadata}.ipfs.w3s.link/`,
     };
   }

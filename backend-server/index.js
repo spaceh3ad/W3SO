@@ -3,19 +3,12 @@ require("dotenv").config();
 
 const lib = require("./utils.js");
 
-// Define custom error scenarios for the API.
-// Return true for the adapter to retry.
-const customError = (data) => {
-  if (data.Response === "Error") return true;
-  return false;
-};
-
 // Define custom parameters to be used by the adapter.
 // Extra parameters can be stated in the extra object,
 // with a Boolean value indicating whether or not they
 // should be required.
 const customParams = {
-  address: ["address"],
+  target: ["target"],
   endpoint: false,
 };
 
@@ -29,12 +22,14 @@ const createRequest = async (input, callback) => {
   const validator = new Validator(input, customParams);
 
   const jobRunID = validator.validated.id;
-  const address = validator.validated.data.address;
+  const target = validator.validated.data.target;
 
-  let report = await lib.mythrilScan(address);
-  report.address = address;
+  let report = await lib.mythrilScan(target);
+  report.address = target;
 
   const response = { date: "", result: report };
+
+  console.log("Done!");
 
   response.data = {
     result: report,
