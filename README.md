@@ -1,4 +1,4 @@
-![](./W3SO.png)
+![](./W3SO.png "Created with Midjourney")
 
 # INTRODUCTION
 
