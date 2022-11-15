@@ -1,3 +1,5 @@
+![](./W3SO.png)
+
 # INTRODUCTION
 
 The project is called W3SO - Web3 Security Oracle - which allows providing the security analysis score on-chain.
