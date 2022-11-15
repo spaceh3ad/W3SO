@@ -22,6 +22,8 @@ The project is called W3SO - Web3 Security Oracle - which allows providing the s
 
 ## Request Data
 
+**Currently only supporting Ethereum**
+
 `curl -X POST -H "content-type:application/json" "http://localhost:8080/" --data '{ "id": 10, "data": { "address":"0x5c436ff914c458983414019195e0f4ecbef9e6dd" }}'` for the API to run mythril inside docker and return the security score for provided address.
 
 When interacting with a Chainlink Node, the External Adapter will receive a post request that looks something like this:
