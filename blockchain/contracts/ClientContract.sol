@@ -4,31 +4,17 @@ pragma solidity ^0.8.7;
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 
-/**
- * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
- * DO NOT USE THIS CODE IN PRODUCTION.
- */
-
-/// @notice Web3 Secrutiy Oracle (W3SO)
 /// @notice allows to retrive a security score for smart contract
-contract W3SO is ChainlinkClient, ConfirmedOwner {
+contract ClientContract is ChainlinkClient, ConfirmedOwner {
     using Chainlink for Chainlink.Request;
 
     uint256 private constant ORACLE_PAYMENT = 1 * LINK_DIVISIBILITY; // 1 * 10**18
 
-    mapping(address => Score) public addressToResult;
-
-    uint1 scoreDecimals = 2;
-
     event RequestForInfoFulfilled(
         bytes32 indexed requestId,
-        string indexed response
+        address targetContract,
+        uint8 score
     );
-
-    struct Score {
-        uint8 sscore;
-        string uri;
-    }
 
     /**
      *  Goerli
@@ -42,27 +28,24 @@ contract W3SO is ChainlinkClient, ConfirmedOwner {
     function requestInfo(
         address _oracle,
         string memory _jobId,
-        address target
-    ) public onlyOwner {
-        console.log(addressToIPFSResult[target]);
-        require(addressToIPFSResult[target] != 0x0);
+        string memory target
+    ) internal {
         Chainlink.Request memory req = buildOperatorRequest(
             stringToBytes32(_jobId),
             this.fulfillRequestInfo.selector
         );
 
-        require(isContract(target));
         req.add("address", target);
 
         sendOperatorRequestTo(_oracle, req, ORACLE_PAYMENT);
     }
 
-    function fulfillRequestInfo(bytes32 _requestId, string memory _info)
-        public
-        recordChainlinkFulfillment(_requestId)
-    {
-        emit RequestForInfoFulfilled(_requestId, _info);
-        lastRetrievedInfo = _info;
+    function fulfillRequestInfo(
+        bytes32 _requestId,
+        address _target,
+        uint8 _score
+    ) public virtual recordChainlinkFulfillment(_requestId) {
+        emit RequestForInfoFulfilled(_requestId, _target, _score);
     }
 
     /*
@@ -96,14 +79,6 @@ contract W3SO is ChainlinkClient, ConfirmedOwner {
 
     function withdrawBalance() public onlyOwner {
         payable(msg.sender).transfer(address(this).balance);
-    }
-
-    function isContract(address _addr) internal returns (bool isContract) {
-        uint32 size;
-        assembly {
-            size := extcodesize(_addr)
-        }
-        return (size > 0);
     }
 
     function cancelRequest(

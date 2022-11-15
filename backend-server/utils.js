@@ -49,7 +49,7 @@ async function parseResult(report) {
     console.log(`Uploaded to IPFS at : https://${cid_metadata}.ipfs.w3s.link/`);
 
     return {
-      score: result.score,
+      score: (1 / issuesArr.length / result.score) * 10_000,
       cid: `https://${cid_metadata}.ipfs.w3s.link/`,
     };
   }

@@ -32,7 +32,7 @@ const createRequest = async (input, callback) => {
   const address = validator.validated.data.address;
 
   let report = await lib.mythrilScan(address);
-  // let report = { score: 0.591, cid: "TEST" };
+  report.address = address;
 
   const response = { date: "", result: report };
 
