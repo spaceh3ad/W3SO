@@ -8,7 +8,7 @@ async function main() {
     "0x4f8ac9aa3C2Af1f44f7Dee0124819B06E7410f25"
   );
 
-  await oracle.securityScan("0x5C436Ff914C458983414019195E0f4ecBEF9e6dd", {
+  await oracle.securityScan("0x872f19a670e5f35eb0eae20ecf9167a5860184d2", {
     gasLimit: 200_000,
   });
 }

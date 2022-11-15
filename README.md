@@ -39,7 +39,11 @@ When interacting with a Chainlink Node, the External Adapter will receive a post
 
 ## Response Data
 
-Our external adapter returns data in the following structure ([docs](https://docs.chain.link/docs/developers/#returning-data)). Not all fields are required though.
+The request returns 3 keys regarding the scan:
+
+- address of a target contract
+- score the higher the more dangerous/vulerable contract is
+- link to ipfs containing full mythril report with added score and bytecode
 
 ```
 returned response:   {
@@ -47,7 +51,8 @@ returned response:   {
   data: {
     result: {
       address: "0x5c436ff914c458983414019195e0f4ecbef9e6dd",
-      score: 0.0625
+      score: 625,
+      cid: https://bafybeidclx7fqun3fwsxuqysnulnrhtsumkxqv24vbit7jdmcwfqwqlkmy.ipfs.w3s.link/
     },
   }
 }

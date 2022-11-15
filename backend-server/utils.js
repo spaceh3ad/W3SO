@@ -1,5 +1,7 @@
 require("dotenv").config();
 const { Web3Storage, File } = require("web3.storage");
+var Web3 = require("web3");
+var web3 = new Web3(`wss://mainnet.infura.io/ws/v3/${process.env.INFURA_ID}`);
 
 function makeStorageClient() {
   return new Web3Storage({ token: process.env.WEB3_STORAGE });
@@ -12,7 +14,7 @@ function makeFileObjects(result) {
   return file;
 }
 
-async function parseResult(report) {
+async function parseResult(report, address) {
   // 1 => contract safe no issues found
   // 0.05 => dangerous
 
@@ -28,7 +30,8 @@ async function parseResult(report) {
   };
 
   if (report[0].issues === []) {
-    return 1; //asume contract ok if no issues found
+    result.score = 1; //asume contract ok if no issues found
+    report[0].issues = "No issues found";
   } else {
     let issuesArr = report[0].issues;
     for (let index = 0; index < issuesArr.length; index++) {
@@ -40,9 +43,12 @@ async function parseResult(report) {
         // low
         result.score += 1;
       }
+      result.score = (1 / issuesArr.length / result.score) * 10_000;
     }
 
-    result.score = (1 / issuesArr.length / result.score) * 10_000;
+    result.bytecode = await web3.eth.getCode(address);
+    result.contract = address;
+
     console.log("Uploading result to IPFS");
     const client = makeStorageClient();
     const reportObj = makeFileObjects(result);
@@ -70,7 +76,7 @@ async function mythrilScan(address) {
       meta.mythril_execution_info.analysis_duration / 1000000000.0
     } sec.`
   );
-  return await parseResult(resultParsed);
+  return await parseResult(resultParsed, address);
 }
 
 module.exports = { mythrilScan };

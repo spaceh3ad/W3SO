@@ -13,7 +13,8 @@
     "@chainlink/external-adapter": "^0.2.6",
     "dotenv": "^16.0.2",
     "ethers": "^5.7.2",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "web3": "^1.8.1"
   },
   "devDependencies": {
     "body-parser": "^1.19.0",
