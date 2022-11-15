@@ -13,7 +13,7 @@ The project is called W3SO - Web3 Security Oracle - which allows providing the s
 # Repo Structure
 
 - `backend-server` - all code regarding EA
-- `contracts` - contracts with example usage of oracle
+- `blockchain` - hardhat project with contract
 
 # Getting Started
 
