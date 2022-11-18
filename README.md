@@ -64,4 +64,4 @@ returned response:   {
 
 # Architecture Diagram
 
-![alt Architecture Drawing Showing The Interaction within the System](./architecture.png "Architecture Diagram")
+![alt Architecture Drawing Showing The Interaction within the System](./W3SO.diagram.png "Architecture Diagram")
